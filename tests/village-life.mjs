@@ -16,6 +16,7 @@ for(let frame=1;frame<=2400;frame++){
     if(actor.resting)paused.add(actor);if(paused.has(actor)&&distance>.005)resumed.add(actor);
     for(const c of colliders){
       const x=actor.root.position.x,z=actor.root.position.z;
+      if(c.kind==='pond'){assert.ok(((x-c.x)/(c.rx+.44))**2+((z-c.z)/(c.rz+.44))**2>=1);continue;}
       if(!c.w){assert.ok(Math.hypot(x-c.x,z-c.z)>=c.r+.44);continue;}
       const dx=x-c.x,dz=z-c.z,lx=dx*Math.cos(c.rotation)-dz*Math.sin(c.rotation),lz=dx*Math.sin(c.rotation)+dz*Math.cos(c.rotation);
       assert.ok(!(Math.abs(lx)<c.w/2+.44&&lz>-c.d/2-.44&&lz<c.d/2+3.04),`${actor.name} entered a house or porch`);

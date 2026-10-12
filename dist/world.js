@@ -1,5 +1,6 @@
 import * as THREE from './vendor/three.module.js';
 import {createVillageLife} from './life.js';
+import {createPond} from './pond.js';
 
 export function createWorld(scene) {
   const colors={grass:'#859b61',sand:'#d6bd91',trim:'#e5d4ac',roof:'#935e4d',leaf:'#44735b',orange:'#d99147',stripe:'#ae6735',cream:'#f5d9ab'};
@@ -88,8 +89,9 @@ export function createWorld(scene) {
   const shadow=new THREE.Mesh(new THREE.PlaneGeometry(1.6,1.8),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(canvas),transparent:true,depthWrite:false}));shadow.rotation.x=-Math.PI/2;shadow.position.y=.018;scene.add(shadow);
   const fish=[];for(const [x,z]of [[-5,5],[5,-6],[-6,-19],[17,6],[-8,24],[6,-27]]){const g=group(x,z);g.position.y=.8;sphere(.22,'#e7bb65',0,0,0,g,1.5,.8,.48);const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute([-.27,0,0,-.48,.16,0,-.48,-.16,0],3));geo.computeVertexNormals();const fin=add(geo,'#dba956',0,0,0,g);fin.material=fin.material.clone();fin.material.side=THREE.DoubleSide;sphere(.025,'#485e51',.23,.04,.09,g);const ring=add(new THREE.TorusGeometry(.45,.01,4,40),'#f6ddb0',0,-.62,0,g);ring.rotation.x=Math.PI/2;fish.push({g,x,z,collected:false});}
   body.name='cat-body';head.name='cat-head';tail.name='cat-tail';legs.forEach(leg=>leg.name='cat-leg');
+  const nature=createPond(scene,{add,sphere,foliage,cylinder,beam,group},cat,colliders);
   const life=createVillageLife(scene,{box,sphere,foliage,cylinder,beam,add,material,group},cat,colliders,houses);
-  const animatedRoots=new Set([cat,...laundry,...palms,...water,...fish.map(f=>f.g),shadow,...life.dynamicRoots]);
+  const animatedRoots=new Set([cat,...laundry,...palms,...water,...fish.map(f=>f.g),shadow,...life.dynamicRoots,...nature.dynamicRoots]);
   scene.updateMatrixWorld(true);
   const batches=new Map();
   scene.traverse(object=>{
@@ -117,5 +119,5 @@ export function createWorld(scene) {
     const combined=new THREE.Mesh(geo,mat);combined.castShadow=objects.some(o=>o.castShadow);combined.receiveShadow=true;scene.add(combined);
   }
   function updateEnvironment(time,height){palms.forEach((p,i)=>{p.rotation.z=Math.sin(time*.7+i)*.012;p.rotation.x=Math.cos(time*.55+i)*.01;});water.forEach((m,i)=>m.scale.x=1+Math.sin(time+i)*.13);shadow.position.x=cat.position.x;shadow.position.z=cat.position.z;shadow.material.opacity=1-height*.35;shadow.scale.setScalar(1+height*.12);}
-  return {cat,body,head,legs,tail,fish,houses,colliders,laundry,updateEnvironment,life};
+  return {cat,body,head,legs,tail,fish,houses,colliders,laundry,updateEnvironment,life,nature};
 }

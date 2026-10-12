@@ -1,0 +1,30 @@
+import assert from 'node:assert/strict';
+import * as THREE from '../dist/vendor/three.module.js';
+import {createWorld} from '../dist/world.js';
+globalThis.document={createElement:()=>({width:0,height:0,getContext:()=>({createRadialGradient:()=>({addColorStop(){}}),fillRect(){},beginPath(){},roundRect(){},fill(){},fillText(){}})})};
+const scene=new THREE.Scene(),world=createWorld(scene),{nature,cat}=world;
+assert.equal(nature.fish.length,6);assert.equal(nature.blades.length,260);
+const jumped=new Set(),splashed=new Set();
+for(let frame=1;frame<=600;frame++){
+  nature.update(frame/20,.05,world.life.cats);
+  nature.fish.forEach((fish,i)=>{assert.ok(fish.root.position.toArray().every(Number.isFinite));if(fish.root.position.y>nature.pond.surface+.6)jumped.add(i);if(fish.ripple.visible&&fish.droplets.some(d=>d.visible))splashed.add(i);});
+}
+assert.equal(jumped.size,6);assert.equal(splashed.size,6);
+cat.position.set(-20,0,-35);
+for(let i=0;i<80;i++)nature.update(31,.05,[]);
+const blade=nature.blades.reduce((a,b)=>Math.hypot(a.x,a.z)<Math.hypot(b.x,b.z)?a:b);
+const neutral=[blade.bendX,blade.bendZ];
+cat.position.set(nature.grass.x+blade.x-.25,0,nature.grass.z+blade.z);
+for(let i=0;i<40;i++)nature.update(31,.05,[]);
+assert.ok(blade.bendX>neutral[0]+.45,'grass must bend away from player');
+const pos=nature.grassMesh.geometry.attributes.position;
+assert.ok(Math.abs(pos.getX(blade.offset)-(blade.x-Math.cos(blade.angle)*blade.width))<1e-5,'blade base must stay anchored');
+cat.position.set(-20,0,-35);
+for(let i=0;i<80;i++)nature.update(31,.05,[]);
+assert.ok(Math.abs(blade.bendX-neutral[0])<.005,'grass must spring back');
+const visitingCat={root:new THREE.Group()};visitingCat.root.position.set(nature.grass.x+blade.x+.25,0,nature.grass.z+blade.z);
+for(let i=0;i<40;i++)nature.update(31,.05,[visitingCat]);
+assert.ok(blade.bendX<neutral[0]-.45,'grass must react to roaming cats too');
+assert.ok(Array.from(pos.array).every(Number.isFinite));
+cat.position.copy(nature.child.position);assert.match(nature.reactToMeow(),/Danish/);
+console.log('Passed: six jumping fish and splash cycles, grass bend/recovery for player and roaming cats, fixed roots, child greeting.');

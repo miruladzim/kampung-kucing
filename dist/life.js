@@ -9,6 +9,7 @@ export function createVillageLife(scene, helpers, player, colliders, houses) {
   function clear(x,z,margin=.45){
     if(x<-22||x>22||z<-37||z>35)return false;
     return !colliders.some(c=>{
+      if(c.kind==='pond')return ((x-c.x)/(c.rx+margin))**2+((z-c.z)/(c.rz+margin))**2<1;
       if(!c.w)return Math.hypot(x-c.x,z-c.z)<c.r+margin;
       const dx=x-c.x,dz=z-c.z,lx=dx*Math.cos(c.rotation)-dz*Math.sin(c.rotation),lz=dx*Math.sin(c.rotation)+dz*Math.cos(c.rotation);
       return Math.abs(lx)<c.w/2+margin&&lz>-c.d/2-margin&&lz<c.d/2+2.6+margin;
