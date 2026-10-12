@@ -4,6 +4,8 @@ A playable 3D Malay village prototype. You control Oyen, a ginger cat, exploring
 ## Run locally
 From this directory run `python3 -m http.server 5173 --directory dist`, then open http://localhost:5173.
 
+Use the Day / Sunset buttons above the quest card for a smooth transition between afternoon and golden evening light.
+
 ## Controls
 - WASD / arrow keys: move relative to the camera
 - Shift: run
