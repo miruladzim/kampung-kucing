@@ -1,4 +1,5 @@
 import * as THREE from './vendor/three.module.js';
+import {prepareRoamingCat,updateRoamingCat} from './cat-motion.js';
 
 // Village life is independent of the player: characters choose clear routes,
 // stop to rest, and react to nearby meows. Decorative gardens join static batches.
@@ -19,9 +20,9 @@ export function createVillageLife(scene, helpers, player, colliders, houses) {
   function chooseTarget(actor){
     const {position}=actor.root;
     for(let i=0;i<28;i++){
-      const a=random()*Math.PI*2,length=2+random()*(actor.kind==='cat'?7:5),x=position.x+Math.sin(a)*length,z=position.z+Math.cos(a)*length;
+      const a=actor.kind==='cat'&&i<20?actor.root.rotation.y+(random()-.5)*2:random()*Math.PI*2,length=2+random()*5,x=position.x+Math.sin(a)*length,z=position.z+Math.cos(a)*length;
       if(actor.kind==='villager'&&(Math.abs(x)>3&&Math.abs(z-8)>1.6))continue;
-      if(clearRoute(position.x,position.z,x,z)){actor.target.set(x,0,z);actor.speed=actor.kind==='cat'?2.3+random()*1.7:.65+random()*.35;actor.rest=0;return true;}
+      if(clearRoute(position.x,position.z,x,z)){actor.target.set(x,0,z);if(actor.kind==='cat')actor.cruiseSpeed=random()<.22?2.05+random()*.4:.95+random()*.45;else actor.speed=.65+random()*.35;actor.rest=0;return true;}
     }
     actor.rest=.7;actor.resting=true;actor.target.copy(position);return false;
   }
@@ -99,7 +100,7 @@ export function createVillageLife(scene, helpers, player, colliders, houses) {
   for(const [name,x,z,coat,mark,scale]of [['Tompok',2.1,13,'#e3dfcb','#7d8275',.84],['Arang',-3.2,7,'#515c56','#3d4743',.92],['Putih',5,18,'#e5e2d4','#c9bda5',.78],['Belang',-2,-10,'#a7a396','#747f77',.88],['Manja',4.8,-6,'#c39777','#936d53',.72]]){
     const root=player.clone(true);root.position.set(x,0,z);root.scale.setScalar(scale);root.userData.role='roaming-cat';root.userData.name=name;scene.add(root);dynamicRoots.push(root);
     const recolored=new Map();root.traverse(object=>{if(!object.isMesh)return;const hex=object.material.color.getHexString();if(!recolored.has(object.material)){const mat=object.material.clone();if(hex==='d99147')mat.color.set(coat);if(hex==='ae6735')mat.color.set(mark);if(hex==='f5d9ab')mat.color.set('#eee5cf');recolored.set(object.material,mat);}object.material=recolored.get(object.material);});
-    const actor={root,name,kind:'cat',legs:[...root.children.filter(c=>c.name==='cat-leg')],head:root.getObjectByName('cat-head'),tail:root.getObjectByName('cat-tail'),body:root.getObjectByName('cat-body'),target:new THREE.Vector3(x,0,z),rest:random()*1.5,speed:3,phase:random()*6.28,attention:0};cats.push(actor);
+    const actor={root,name,kind:'cat',legs:[...root.children.filter(c=>c.name==='cat-leg')],head:root.getObjectByName('cat-head'),tail:root.getObjectByName('cat-tail'),body:root.getObjectByName('cat-body'),target:new THREE.Vector3(x,0,z),rest:random()*1.5,phase:random()*6.28,attention:0};prepareRoamingCat(actor);cats.push(actor);
   }
   // Four hinged wings flap while each butterfly circles a flower garden.
   for(let i=0;i<18;i++){
@@ -115,6 +116,7 @@ export function createVillageLife(scene, helpers, player, colliders, houses) {
     butterflies.push({root,wings,garden,phase:random()*6.28,radius:.6+random()*1.1,speed:.65+random()*.45});
   }
   let currentTime=0;
+  const catEnvironment={clear,chooseTarget,random,neighbors:[...cats,...villagers,{root:player}],player};
   function reactToMeow(){
     const nearby=villagers.filter(v=>v.root.position.distanceTo(player.position)<6).sort((a,b)=>a.root.position.distanceTo(player.position)-b.root.position.distanceTo(player.position));
     nearby.forEach(v=>v.wave=currentTime+3);
@@ -124,6 +126,7 @@ export function createVillageLife(scene, helpers, player, colliders, houses) {
     return replies[nearby[0].name];
   }
   function updateActor(actor,time,dt){
+    if(actor.kind==='cat'){updateRoamingCat(actor,time,dt,catEnvironment);return;}
     let moving=false;
     if(!actor.stationary){
       if(actor.resting){
@@ -139,18 +142,12 @@ export function createVillageLife(scene, helpers, player, colliders, houses) {
         const angle=Math.atan2(dx,dz);actor.root.rotation.y+=Math.atan2(Math.sin(angle-actor.root.rotation.y),Math.cos(angle-actor.root.rotation.y))*Math.min(9*dt,1);
       }
     }
-    const phase=time*(actor.kind==='cat'?14:4)+actor.phase;
-    actor.legs.forEach((leg,i)=>leg.rotation.x=moving?Math.sin(phase+(actor.kind==='cat'?(i===0||i===3?0:Math.PI):i*Math.PI))*(actor.kind==='cat'?.5:.36):0);
-    if(actor.kind==='cat'){
-      actor.tail.rotation.z=Math.sin(time*3+actor.phase)*.22;
-      actor.body.position.y=.64+(moving?Math.sin(time*28)*.02:Math.sin(time*2)*.008);
-      actor.head.rotation.y=time<actor.attention?Math.sin(time*5)*.2:Math.sin(time*.9+actor.phase)*.04;
-    }else{
-      actor.arms.forEach((arm,i)=>{arm.rotation.x=moving?-Math.sin(phase+i*Math.PI)*.28:Math.sin(time*1.5+actor.phase)*.035;arm.rotation.z=time<actor.wave&&i===1?-2.25+Math.sin(time*8)*.2:0;});
-      actor.torso.rotation.z=Math.sin(time*1.3+actor.phase)*.012;
-      actor.nameTag.visible=actor.root.position.distanceTo(player.position)<5;
-      if(time<actor.wave){const dx=player.position.x-actor.root.position.x,dz=player.position.z-actor.root.position.z;actor.root.rotation.y=Math.atan2(dx,dz);}
-    }
+    const phase=time*4+actor.phase;
+    actor.legs.forEach((leg,i)=>leg.rotation.x=moving?Math.sin(phase+i*Math.PI)*.36:0);
+    actor.arms.forEach((arm,i)=>{arm.rotation.x=moving?-Math.sin(phase+i*Math.PI)*.28:Math.sin(time*1.5+actor.phase)*.035;arm.rotation.z=time<actor.wave&&i===1?-2.25+Math.sin(time*8)*.2:0;});
+    actor.torso.rotation.z=Math.sin(time*1.3+actor.phase)*.012;
+    actor.nameTag.visible=actor.root.position.distanceTo(player.position)<5;
+    if(time<actor.wave){const dx=player.position.x-actor.root.position.x,dz=player.position.z-actor.root.position.z;actor.root.rotation.y=Math.atan2(dx,dz);}
   }
   function update(time,dt){
     currentTime=time;[...cats,...villagers].forEach(a=>updateActor(a,time,dt));
@@ -161,7 +158,7 @@ export function createVillageLife(scene, helpers, player, colliders, houses) {
       b.wings.forEach(w=>w.hinge.rotation.z=w.side*(.4+Math.sin(time*18+b.phase)*.75));
     });
   }
-  // Start with visible activity, then alternate running/walking with short rests.
-  [...cats,...villagers.filter(v=>!v.stationary)].forEach(a=>{a.resting=false;chooseTarget(a);});
+  // Most cats stroll; occasional trots alternate with quiet pauses.
+  [...cats,...villagers.filter(v=>!v.stationary)].forEach(a=>{a.resting=false;chooseTarget(a);if(a.kind==='cat')a.root.rotation.y=Math.atan2(a.target.x-a.root.position.x,a.target.z-a.root.position.z);});
   return {dynamicRoots,update,reactToMeow,villagers,cats,butterflies};
 }

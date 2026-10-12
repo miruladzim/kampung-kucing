@@ -6,6 +6,8 @@ From this directory run `python3 -m http.server 5173 --directory dist`, then ope
 
 Use the Day / Sunset buttons above the quest card for a smooth transition between afternoon and golden evening light.
 
+Village cats stroll and occasionally trot, slow down before turns and stops, and yield to nearby characters. Their four-beat walk and diagonal trot follow the distance traveled, with jointed legs that plant and lift their paws. Meowing nearby makes them pause and look at Oyen.
+
 ## Controls
 - WASD / arrow keys: move relative to the camera
 - Shift: run
@@ -18,4 +20,4 @@ Use the Day / Sunset buttons above the quest card for a smooth transition betwee
 Built with Three.js (vendored, MIT licensed). No build step or server data storage required.
 
 ## Verify village life
-Run `npm test` to simulate two minutes of roaming and verify obstacle avoidance, rest/resume, greetings, butterfly movement, pond jump/splash cycles, and grass bending and recovery.
+Run `npm test` to simulate two minutes of roaming and verify obstacle avoidance, smooth acceleration and turns, forward-facing movement, planted paws, rest/resume, greetings, butterfly movement, pond jump/splash cycles, and grass bending and recovery.
