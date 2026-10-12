@@ -1,5 +1,5 @@
 # Kampung Kucing
-A playable 3D Malay village prototype. You control Oyen, a ginger cat, exploring stilt houses, coconut palms, a village stall, and a riverside kampung. Find six floating fish or simply wander.
+A playable 3D Malay village prototype. You control Oyen, a ginger cat, exploring stilt houses, coconut palms, a village stall, and a riverside kampung. Find six floating fish or simply wander. Meet five animated villagers and five roaming cats, explore flower gardens, and watch eighteen butterflies flutter among the blooms. Press E near villagers for a greeting.
 
 ## Run locally
 From this directory run `python3 -m http.server 5173 --directory dist`, then open http://localhost:5173.
@@ -14,3 +14,6 @@ From this directory run `python3 -m http.server 5173 --directory dist`, then ope
 - Touch controls are available on small screens
 
 Built with Three.js (vendored, MIT licensed). No build step or server data storage required.
+
+## Verify village life
+Run `npm test` to simulate two minutes of roaming and verify obstacle avoidance, rest/resume, greetings, and butterfly movement.

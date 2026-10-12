@@ -1,0 +1,8 @@
+{
+  "name": "kampung-kucing",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node tests/village-life.mjs"
+  }
+}
