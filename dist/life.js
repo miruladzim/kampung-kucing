@@ -1,5 +1,5 @@
 import * as THREE from './vendor/three.module.js';
-import {prepareRoamingCat,updateRoamingCat} from './cat-motion.js';
+import {prepareRoamingCat,resetCatGait,updateRoamingCat} from './cat-motion.js';
 
 // Village life is independent of the player: characters choose clear routes,
 // stop to rest, and react to nearby meows. Decorative gardens join static batches.
@@ -159,6 +159,6 @@ export function createVillageLife(scene, helpers, player, colliders, houses) {
     });
   }
   // Most cats stroll; occasional trots alternate with quiet pauses.
-  [...cats,...villagers.filter(v=>!v.stationary)].forEach(a=>{a.resting=false;chooseTarget(a);if(a.kind==='cat')a.root.rotation.y=Math.atan2(a.target.x-a.root.position.x,a.target.z-a.root.position.z);});
+  [...cats,...villagers.filter(v=>!v.stationary)].forEach(a=>{a.resting=false;chooseTarget(a);if(a.kind==='cat'){a.root.rotation.y=Math.atan2(a.target.x-a.root.position.x,a.target.z-a.root.position.z);resetCatGait(a);}});
   return {dynamicRoots,update,reactToMeow,villagers,cats,butterflies};
 }
