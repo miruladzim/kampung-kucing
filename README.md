@@ -2,15 +2,15 @@
 
 [Play the game](https://miruladzim.github.io/kampung-kucing/)
 
-A playable 3D Malay village prototype. You control Oyen, a ginger cat, exploring stilt houses, coconut palms, a village stall, and a riverside kampung. Earn four fish by completing the learning stations, or simply wander. Meet five animated villagers and five roaming cats, explore flower gardens, and watch eighteen butterflies flutter among the blooms. Press E near villagers for a greeting and F near a numbered station to open a learning mission. Visit the southeastern koi pond to see jumping fish and splash ripples, meet Danish on the bank, and walk through the tall grass that bends around player and roaming cats.
+A playable 3D Malay village prototype. You control Oyen, a ginger cat, exploring stilt houses, coconut palms, a village stall, and a riverside kampung. Earn four fish by completing the learning stations, or simply wander. Meet five animated villagers and five roaming cats, explore flower gardens, and watch eighteen butterflies flutter among the blooms. Press E near villagers for a greeting and F near an object to pick up, deliver or operate it. Learning happens inside the playable village. Visit the southeastern koi pond to see jumping fish and splash ripples, meet Danish on the bank, and walk through the tall grass that bends around player and roaming cats.
 
 ## Misi Jejak Sejarah
 
-The game now includes a Bahasa Melayu formative-assessment lesson for Form 2 Sejarah, Chapter 2.2, SP 5.2.2. Four stations cover agriculture, trade, forest/marine products, and mining/manufacturing. Twelve activities combine single-choice, two-answer reasoning and sorting, with original visual diagrams, optional browser narration, feedback, hints and retries. Each completed station awards one fish.
+The game now includes a Bahasa Melayu formative-assessment lesson for Form 2 Sejarah, Chapter 2.2, SP 5.2.2. Four stations cover agriculture, trade, forest/marine products, and mining/manufacturing. Twelve tasks use physical interactions: carry water to an irrigation gate, carry and sort goods into baskets, operate two facilities, and deliver mineral materials and finished pots along an economic chain. Walk Oyen to an object, press F (or the touch interaction button), carry it to its destination and press F again. A gong checks a completed sorting arrangement or two selected operations. Water and crops change as irrigation is restored; deliveries and crafting leave visible rewards. Each completed station awards one fish. The mission book contains progress and directions, with no quiz opening in the main 3D flow.
 
-First-attempt accuracy, hint use, retries and completion remain separate. Learners can enter an optional alias, write an exit reflection and export a CSV for the teacher. Sessions are saved only in the current browser; there is no central classroom dashboard. Export results before changing learners on a shared device. Written reflections require teacher assessment.
+First-attempt accuracy, hint use, retries and completion remain separate. Learners can enter an optional alias, write an exit reflection and export a CSV for the teacher. Completed tasks and checked attempts are saved in the current browser. Unchecked arrangements restart after reloading; there is no central classroom dashboard. Export results before changing learners on a shared device. Written reflections require teacher assessment.
 
-All activities are accessible from the mission book without navigating the cat. [Activity mode without 3D](https://miruladzim.github.io/kampung-kucing/?mode=ringan) shares the same assessment state and is also used when WebGL is unavailable.
+An optional alternative presents the same assessment concepts as visual questions without navigating the cat. [Activity mode without 3D](https://miruladzim.github.io/kampung-kucing/?mode=ringan) uses separate progress records and is also used when WebGL is unavailable.
 
 - [Public teacher guide](https://miruladzim.github.io/kampung-kucing/panduan-guru.html)
 - [40-minute lesson blueprint](docs/lesson-blueprint.md)
@@ -30,7 +30,8 @@ Oyen and the village cats share a stride-based movement system. Planted paws sta
 - Shift: run
 - Space: jump
 - E: meow
-- F: open the nearby learning station
+- F / touch interaction: pick up, place, operate or check the nearby object
+- ⌖: progress and station directions; ▥: assessment report
 - Drag: orbit the camera
 - Scroll: zoom
 - Touch controls are available on small screens
@@ -43,4 +44,4 @@ The game is published at https://miruladzim.github.io/kampung-kucing/.
 Pushing to `main` runs the game tests and deploys the `dist/` directory through `.github/workflows/pages.yml`. You can also run the workflow manually from the repository's Actions tab. Assets use relative paths so the game works under the repository's Pages URL.
 
 ## Verify village life
-Run `npm test` to simulate two minutes of roaming and verify obstacle avoidance, smooth acceleration and turns, forward-facing movement, rendered paw contact locks, stride/distance synchronization, idle and blocked movement, walk/trot transitions, jumping and landing, rest/resume, greetings, butterflies, pond jump/splash cycles, grass bending and recovery, and assessment state, first-attempt records, hints, rewards, persistence and CSV export.
+Run `npm test` to simulate two minutes of roaming and verify obstacle avoidance, smooth acceleration and turns, forward-facing movement, rendered paw contact locks, stride/distance synchronization, idle and blocked movement, walk/trot transitions, jumping and landing, rest/resume, greetings, butterflies, pond jump/splash cycles, grass bending and recovery, assessment state, first-attempt records, hints, rewards, persistence and CSV export, plus physical mission progression, complete sorting before checking, reversible operations and two-delivery chains.

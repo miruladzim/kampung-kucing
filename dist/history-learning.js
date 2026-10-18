@@ -7,12 +7,13 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const asset=name=>`history-assets/${name}.svg`;
 const visualAlt={irrigation:'Air dari takungan melalui saluran menuju sawah padi.',harbour:'Peta skematik: pedagang dari barat dan timur menuju pelabuhan P.',goods:'Empat kad bergambar: padi, lada hitam, rotan dan mutiara.','forest-sea':'Hutan: rotan dan gaharu. Laut: mutiara dan rumpai laut.','rattan-craft':'Rotan yang panjang dan lentur serta contoh bakul kraf.',workshop:'Perlombongan mendapatkan mineral. Pembuatan mengolah bahan seperti tanah liat menjadi tembikar.',exchange:'Pengeluar dan pedagang dihubungkan oleh anak panah jual beli atau pertukaran.'};
 
-export function createHistoryLearning({onOpen,onLaunch,onTrack,onReward}){
+export function createHistoryLearning({onOpen,onLaunch,onTrack,onReward,worldMode=false}){
   const dialog=$('learningDialog'),body=$('learningBody');
   let session,saveAvailable=true;
-  try{session=restoreSession(localStorage.getItem(KEY));}catch{session=newSession();saveAvailable=false;}
+  try{session=restoreSession(localStorage.getItem(worldMode?KEY+'-world':KEY));}catch{session=newSession();saveAvailable=false;}
+  session.mode=worldMode?'world':'visual';
   let activeStation=null,index=0,draft=[],feedback=null,nearby=null,returnFocus=null;
-  function persist(){try{localStorage.setItem(KEY,JSON.stringify(session));}catch{saveAvailable=false;}updateHud();}
+  function persist(){try{localStorage.setItem(worldMode?KEY+'-world':KEY,JSON.stringify(session));}catch{saveAvailable=false;}updateHud();}
   function updateHud(){
     const s=summary(session);$('count').textContent=`${s.fish} / 4 ikan`;
     $('questText').textContent=s.fish===4?'Semua stesen selesai. Lihat laporan pembelajaran.':`${s.solved} / 12 aktiviti selesai · Ikut rentak sendiri`;
@@ -32,13 +33,13 @@ export function createHistoryLearning({onOpen,onLaunch,onTrack,onReward}){
   function openBook(){
     activeStation=null;show();dialog.className='lesson-dialog book-dialog';
     const s=summary(session);
-    body.innerHTML=header('SEJARAH TINGKATAN 2 · BAB 2.2','Buku Misi Oyen','Terokai kegiatan ekonomi masyarakat kerajaan Alam Melayu. Tiada had masa, tiada kedudukan awam.')+
+    body.innerHTML=header('SEJARAH TINGKATAN 2 · BAB 2.2',worldMode?'Jejak misi di kampung':'Buku Misi Oyen','Terokai kegiatan ekonomi masyarakat kerajaan Alam Melayu. Tiada had masa, tiada kedudukan awam.')+
       `<div class="book-welcome"><label for="learnerAlias">Nama samaran <span>(pilihan)</span></label><input id="learnerAlias" maxlength="30" autocomplete="off" placeholder="Contoh: Penjelajah 01" value="${esc(session.alias)}"><p>Jawapan disimpan pada pelayar ini. Pada peranti berkongsi, muat turun laporan sebelum menukar murid.</p>${!saveAvailable?'<p role="status">Simpanan pelayar tidak tersedia. Kekalkan tab ini dan muat turun laporan sebelum keluar.</p>':''}</div>
       <div class="book-progress"><strong>${s.fish} / 4 ikan misi</strong><span>${s.solved} / 12 aktiviti selesai</span></div>
       <div class="station-grid">${STATIONS.map(st=>{
         const done=stationComplete(session,st.id),n=st.questions.filter(q=>solved(session,q.id)).length;
-        return `<article class="station-card" style="--station-color:${st.color}"><div class="station-card-top"><span class="station-number">${st.number}</span><span class="station-status">${done?'✓ Selesai':`${n} / 3 aktiviti`}</span></div><img src="${asset(st.visual)}" alt="${visualAlt[st.visual]}"><h3>${st.name}</h3><p>${st.description}</p><div class="station-card-actions"><button class="lesson-primary" data-action="station" data-id="${st.id}">${done?'Ulang kaji':'Main aktiviti'} ↗</button><button class="lesson-secondary" data-action="track" data-id="${st.id}">Jejak di kampung</button></div></article>`;
-      }).join('')}</div><p class="lesson-tip">Pilih aktiviti di sini, atau dekati penanda bernombor dalam kampung dan tekan <kbd>F</kbd>. Semua stesen boleh diteroka mengikut pilihan sendiri.</p>
+        return `<article class="station-card" style="--station-color:${st.color}"><div class="station-card-top"><span class="station-number">${st.number}</span><span class="station-status">${done?'✓ Selesai':`${n} / 3 aktiviti`}</span></div><img src="${asset(st.visual)}" alt="${visualAlt[st.visual]}"><h3>${st.name}</h3><p>${st.description}</p><div class="station-card-actions"><button class="lesson-primary" data-action="${worldMode?'track':'station'}" data-id="${st.id}">${worldMode?'Jejak tempat ini':done?'Ulang kaji':'Main aktiviti'} ↗</button>${worldMode?'':`<button class="lesson-secondary" data-action="track" data-id="${st.id}">Jejak di kampung</button>`}</div></article>`;
+      }).join('')}</div><p class="lesson-tip">${worldMode?'Tutup buku dan bermain sebagai Oyen. Angkut barang, kendalikan kemudahan dan susun hasil di kampung dengan F. Buku ini hanya menunjukkan kemajuan dan arah.':'Pilih aktiviti untuk belajar tanpa kawalan 3D.'}</p>
       <div class="lesson-footer"><button class="lesson-secondary" data-action="results">Lihat laporan</button><a href="panduan-guru.html" target="_blank" rel="noopener">Panduan guru & objektif ↗</a><button class="lesson-text" data-action="reset-confirm">Sesi baharu</button></div>${sources()}`;
     $('learnerAlias').addEventListener('input',e=>{session.alias=e.target.value.trim().slice(0,30);persist();});
     focusHeading();
@@ -79,7 +80,7 @@ export function createHistoryLearning({onOpen,onLaunch,onTrack,onReward}){
   }
   function openResults(){
     activeStation=null;show();dialog.className='lesson-dialog results-dialog';const s=summary(session);
-    body.innerHTML=header('LAPORAN PEMBELAJARAN','Lihat perjalanan belajar anda',`${esc(session.alias||'Penjelajah tanpa nama')} · Sejarah Tingkatan 2 · SP 5.2.2`)+
+    body.innerHTML=header('LAPORAN PEMBELAJARAN','Lihat perjalanan belajar anda',`${esc(session.alias||'Penjelajah tanpa nama')} · ${worldMode?'Misi fizikal 3D':'Aktiviti rajah'} · SP 5.2.2`)+
       `<div class="result-metrics"><div><strong>${s.fish}<small> / 4</small></strong><span>Ikan misi</span></div><div><strong>${s.solved}<small> / 12</small></strong><span>Aktiviti selesai</span></div><div><strong>${s.firstCorrect}<small> / ${s.answered}</small></strong><span>Betul pada cubaan pertama</span></div><div><strong>${s.retries}</strong><span>Percubaan tambahan</span></div></div>
       <p class="result-context">${s.answered} daripada 12 aktiviti telah dijawab. ${s.independent} jawapan pertama betul tanpa petunjuk. Pengelasan awal: <strong>${s.sortCorrect} / ${s.sortTotal} contoh</strong> daripada 12 contoh keseluruhan (sasaran: sekurang-kurangnya 8 / 12). Penyelesaian selepas cuba semula ditunjukkan berasingan daripada ketepatan awal.</p>
       <div class="report-table-wrap"><table class="report-table"><caption>Rekod pada peranti ini</caption><thead><tr><th>Stesen / konsep</th><th>Cubaan pertama</th><th>Percubaan</th><th>Status</th></tr></thead><tbody>${QUESTIONS.map(q=>{const r=session.records[q.id],first=r?.attempts[0];return `<tr><td><span>${q.stationName}</span><strong>${q.concept}</strong></td><td>${first?(first.correct?'✓ Betul':'Perlu semakan')+(first.assisted?' · dengan petunjuk':''):'Belum dijawab'}</td><td>${r?.attempts.length||'—'}</td><td>${solved(session,q.id)?'✓ Selesai':first?'Cuba lagi':'—'}</td></tr>`;}).join('')}</tbody></table></div>
@@ -108,10 +109,10 @@ export function createHistoryLearning({onOpen,onLaunch,onTrack,onReward}){
     if(action==='reset-confirm'){
       body.innerHTML=header('PERANTI BERKONGSI','Mulakan sesi baharu?','Muat turun laporan dahulu jika anda mahu menyimpannya. Sesi semasa akan diganti pada pelayar ini.')+'<div class="lesson-footer"><button class="lesson-primary" data-action="reset">Ya, sesi baharu</button><button class="lesson-secondary" data-action="book">Kembali</button></div>';focusHeading();return;
     }
-    if(action==='reset'){session=newSession();persist();openBook();return;}
+    if(action==='reset'){session=newSession();session.mode=worldMode?'world':'visual';persist();if(worldMode)location.reload();else openBook();return;}
     if(action==='csv'){
       const blob=new Blob([resultsCsv(session)],{type:'text/csv;charset=utf-8;'}),url=URL.createObjectURL(blob),a=document.createElement('a');
-      a.href=url;a.download='kampung-kucing-sejarah-laporan.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+      a.href=url;a.download=worldMode?'kampung-kucing-sejarah-3d-laporan.csv':'kampung-kucing-sejarah-laporan.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
       $('downloadStatus').textContent='Fail CSV dimuat turun. Serahkan fail ini kepada guru melalui kaedah yang ditetapkan.';return;
     }
     if(!activeStation)return;
@@ -138,7 +139,7 @@ export function createHistoryLearning({onOpen,onLaunch,onTrack,onReward}){
   $('learningReport').addEventListener('click',openResults);
   $('nearbyMission').addEventListener('click',()=>{if(nearby)openStation(nearby.id);});
   updateHud();
-  return {openBook,openStation,openResults,isOpen:()=>dialog.open,getSession:()=>session,
+  return {saveWorld:persist,rewardWorld:onReward,openBook,openStation,openResults,isOpen:()=>dialog.open,getSession:()=>session,
     setNearby(st){if(nearby?.id===st?.id)return;nearby=st;const b=$('nearbyMission');b.hidden=!st;b.textContent=st?`F · ${st.name} — buka misi`:'';},
     interact(){if(nearby){openStation(nearby.id);return true;}return false;}};
 }
