@@ -122,7 +122,7 @@ export function createVillageLife(scene, helpers, player, colliders, houses) {
     nearby.forEach(v=>v.wave=currentTime+3);
     cats.filter(c=>c.root.position.distanceTo(player.position)<7).forEach(c=>c.attention=currentTime+2);
     if(!nearby.length)return null;
-    const replies={'Pak Rahman':'Pak Rahman: Oyen! Hungry again?','Mak Siti':'Mak Siti: Hello, sayang. Mind the flowers!','Aina':'Aina: Comelnya! Hello, little cat.','Amir':'Amir: Oyen, want to explore together?','Pak Hassan':'Pak Hassan: Selamat petang, Oyen!'};
+    const replies={'Pak Rahman':'Pak Rahman: Oyen! Singgah di stesen perdagangan.','Mak Siti':'Mak Siti: Hai, Oyen! Mari jejaki kegiatan pertanian.','Aina':'Aina: Comelnya! Selamat menjelajah, Oyen.','Amir':'Amir: Oyen, jom terokai sejarah bersama!','Pak Hassan':'Pak Hassan: Selamat petang, Oyen! Kenali hasil hutan dan laut.'};
     return replies[nearby[0].name];
   }
   function updateActor(actor,time,dt){
