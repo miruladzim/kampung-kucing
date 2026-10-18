@@ -9,8 +9,8 @@ These screenshots record distinct chronological development stages. Assessment r
 
 The first four screenshots document the earlier modal-quiz iteration. User review then identified that the quiz felt separate from the village. The next two screenshots document the response to that feedback:
 
-5. [Integrated physical missions](05-in-world-missions.png): Oyen carries rotan to the forest/sea basket while the village remains playable; the irrigated rice plot is visible beside the road. No quiz page is open. This screenshot is from the revised 3D QA session.
-6. [Report from in-world play](06-world-assessment-report.png): the report shows **Ujian prototaip 3D**, one completed irrigation task, one correct first attempt and eleven tasks still unassessed. Placing a sorting item without ringing the gong does not create an assessment attempt. This is genuine partial browser QA, not a claim that all twelve tasks were completed in the browser.
+5. [Integrated physical missions](05-in-world-missions.jpg): Oyen carries rotan to the forest/sea basket while the village remains playable; the irrigated rice plot is visible beside the road. No quiz page is open. This screenshot is from the revised 3D QA session.
+6. [Report from in-world play](06-world-assessment-report.jpg): the report shows **Ujian prototaip 3D**, one completed irrigation task, one correct first attempt and eleven tasks still unassessed. Placing a sorting item without ringing the gong does not create an assessment attempt. This is genuine partial browser QA, not a claim that all twelve tasks were completed in the browser.
 
 For a four-image assignment sequence, use **01, 02, 05 and 06**, explaining the initial village, the first educational iteration, the change to physical gameplay after feedback, and the resulting assessment record. Keep the earlier quiz screenshots as development history rather than describing them as the current interaction design. No screenshot represents real students or measured learning improvement.
 
