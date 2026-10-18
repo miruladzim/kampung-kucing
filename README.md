@@ -1,4 +1,7 @@
 # Kampung Kucing
+
+[Play the game](https://miruladzim.github.io/kampung-kucing/)
+
 A playable 3D Malay village prototype. You control Oyen, a ginger cat, exploring stilt houses, coconut palms, a village stall, and a riverside kampung. Find six floating fish or simply wander. Meet five animated villagers and five roaming cats, explore flower gardens, and watch eighteen butterflies flutter among the blooms. Press E near villagers for a greeting. Visit the southeastern koi pond to see jumping fish and splash ripples, meet Danish on the bank, and walk through the tall grass that bends around player and roaming cats.
 
 ## Run locally
@@ -18,6 +21,11 @@ Oyen and the village cats share a stride-based movement system. Planted paws sta
 - Touch controls are available on small screens
 
 Built with Three.js (vendored, MIT licensed). No build step or server data storage required.
+
+## GitHub Pages
+
+The game is published at https://miruladzim.github.io/kampung-kucing/.
+Pushing to `main` runs the game tests and deploys the `dist/` directory through `.github/workflows/pages.yml`. You can also run the workflow manually from the repository's Actions tab. Assets use relative paths so the game works under the repository's Pages URL.
 
 ## Verify village life
 Run `npm test` to simulate two minutes of roaming and verify obstacle avoidance, smooth acceleration and turns, forward-facing movement, rendered paw contact locks, stride/distance synchronization, idle and blocked movement, walk/trot transitions, jumping and landing, rest/resume, greetings, butterflies, pond jump/splash cycles, and grass bending and recovery.
