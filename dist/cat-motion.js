@@ -1,6 +1,8 @@
 import * as THREE from './vendor/three.module.js';
 
-const up=new THREE.Vector3(0,1,0),direction=new THREE.Vector3(),kneePoint=new THREE.Vector3();
+const down=new THREE.Vector3(0,-1,0),direction=new THREE.Vector3();
+// Neutral hip-to-foot distance; the rounded ends reach the ground at the foot.
+const legLength=.436,legGeometry=new THREE.CapsuleGeometry(.085,legLength,4,10);
 const angleDifference=(a,b)=>Math.atan2(Math.sin(a-b),Math.cos(a-b));
 const approach=(value,target,step)=>value+THREE.MathUtils.clamp(target-value,-step,step);
 const pawHeight=.13*.66+.0002;
@@ -31,35 +33,24 @@ export function prepareRoamingCat(actor){
   for(const child of [...actor.root.children])if(!actor.legs.includes(child))actor.upperBody.add(child);
   actor.root.add(actor.upperBody);
   actor.rig=actor.legs.map(leg=>{
-    const fur=leg.children[0].material,paw=leg.children[1];
+    // Each leg is one simple rounded piece; `paw` is an invisible marker at the foot.
+    const fur=leg.children[0].material;
     leg.clear();leg.rotation.set(0,0,0);
-    const segment=()=>{
-      const mesh=new THREE.Mesh(new THREE.SphereGeometry(.095,12,8),fur);
-      mesh.castShadow=true;mesh.receiveShadow=true;leg.add(mesh);return mesh;
-    };
-    const upper=segment(),lower=segment(),knee=segment();knee.scale.setScalar(.9);
-    leg.add(paw);
-    return {leg,upper,lower,knee,paw,lift:0,bend:leg.position.z>0?-1:1,
+    const limb=new THREE.Mesh(legGeometry,fur);limb.castShadow=true;limb.receiveShadow=true;
+    const paw=new THREE.Object3D();leg.add(limb,paw);
+    return {leg,limb,paw,lift:0,
       anchor:new THREE.Vector3(),footWorld:new THREE.Vector3(),swingStart:new THREE.Vector3(),landing:new THREE.Vector3()};
   });
   resetCatGait(actor);
 }
 
 function poseLeg(rig,x,y,z){
-  const length=Math.hypot(x,y,z),segmentLength=.285;
-  direction.set(x,y,z).divideScalar(length);
-  // Project the knee bend perpendicular to the hip-to-paw direction.
-  kneePoint.set(0,0,-rig.bend).addScaledVector(direction,direction.z*rig.bend).normalize();
-  kneePoint.multiplyScalar(Math.sqrt(Math.max(0,segmentLength**2-length**2/4)))
-    .addScaledVector(direction,length/2);
-  rig.knee.position.copy(kneePoint);
-  rig.upper.position.copy(kneePoint).multiplyScalar(.5);
-  direction.copy(kneePoint);let size=direction.length();
-  rig.upper.quaternion.setFromUnitVectors(up,direction.normalize());rig.upper.scale.set(.9,size/.19,.95);
-  direction.set(x,y,z).sub(kneePoint);size=direction.length();
-  rig.lower.position.copy(kneePoint).addScaledVector(direction,.5);
-  rig.lower.quaternion.setFromUnitVectors(up,direction.normalize());rig.lower.scale.set(.9,size/.19,.95);
-  rig.paw.position.set(x,y,z);rig.paw.rotation.set(0,0,0);
+  // Stretch the single leg piece from the hip to the foot.
+  direction.set(x,y,z);const length=direction.length();
+  rig.limb.position.copy(direction).multiplyScalar(.5);
+  rig.limb.quaternion.setFromUnitVectors(down,direction.divideScalar(length));
+  rig.limb.scale.set(1,length/legLength,1);
+  rig.paw.position.set(x,y,z);
 }
 
 // The accepted stride advance drives both root motion and the leg cycle.
