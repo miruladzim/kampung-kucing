@@ -71,8 +71,9 @@ if(trackedStation&&trackedStation.questions.every(q=>learning.getSession().recor
 if(!trackedStation)$('routeHint').hidden=true;
 if(trackedStation&&started){
   const distance=Math.hypot(cat.position.x-trackedStation.x,cat.position.z-trackedStation.z);
-  $('routeHint').hidden=distance<6;$('routeHint').textContent=distance<6?`Tempat misi ditemui`:`Jejak ${trackedStation.number} · ${trackedStation.name} · ${Math.round(distance)} m`;
-  if(distance<6){$('routeHint').textContent=`${trackedStation.name} · Dekati barang · F untuk berinteraksi`;}
+  // Near a station the mission card and F prompt take over, so the route hint steps aside.
+  $('routeHint').hidden=distance<6||!$('worldTask').hidden;
+  if(!$('routeHint').hidden)$('routeHint').textContent=`Jejak ${trackedStation.number} · ${trackedStation.name} · ${Math.round(distance)} m`;
 }
 target.set(cat.position.x,cat.position.y+.8,cat.position.z);desired.set(target.x+Math.sin(yaw)*zoom,target.y+zoom*.57,target.z+Math.cos(yaw)*zoom);if(!started){desired.set(26,22,34);target.set(0,1,2);}camera.position.lerp(desired,1-Math.exp(-4*dt));camera.lookAt(target);drawMap();timeOfDay.update(dt,camera);renderer.render(scene,camera);}
 camera.position.set(26,22,34);window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});$('loading').remove();animate();

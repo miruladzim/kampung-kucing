@@ -68,6 +68,10 @@ Development screenshots show genuine stages of this prototype. Later assessment 
 - Stage 2: learning station book and visual assets — evidence/02-learning-stations.jpg.
 - Stage 3: interactive question and feedback verification — evidence/03-question-feedback.jpg.
 - Stage 4: assessment report and follow-up verification — evidence/04-assessment-report.jpg.
+- Stage 5: missions moved into the playable village after user feedback — evidence/05-in-world-missions.jpg.
+- Stage 6: assessment report recorded from in-world play (partial prototype QA) — evidence/06-world-assessment-report.jpg.
+
+Stages 3 and 4 document the earlier modal-quiz iteration. For a four-image sequence, use stages 1, 2, 5 and 6, as described in evidence/README.md.
 
 ## Rationale and practical limits
 
